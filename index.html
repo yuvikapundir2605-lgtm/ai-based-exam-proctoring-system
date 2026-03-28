@@ -1,7 +1,40 @@
 <html>
-    <head></head>
-    <body>
-        <h1>AI Proctoring System</h1>
-        <img src ="http://127.0.0.1:5000/video" width = "600">
-    </body>
-</html>    
+<head>
+    <title>AI Proctoring System</title>
+</head>
+
+<body>
+    <h1>AI Proctoring System</h1>
+
+    <img src="http://127.0.0.1:5000/video" width="600">
+
+    <h2 id="status">Loading...</h2>
+
+    <script>
+    function fetchStatus() {
+        fetch("http://127.0.0.1:5000/status")
+            .then(response => response.text())
+            .then(data => {
+                let statusElement = document.getElementById("status");
+
+                if (data.includes("No Face")) {
+                    statusElement.innerText = "⚠ No Face Detected";
+                    statusElement.style.color = "orange";
+                } 
+                else if (data.includes("Multiple")) {
+                    statusElement.innerText = "🚨 Multiple Faces Detected";
+                    statusElement.style.color = "red";
+                } 
+                else {
+                    statusElement.innerText = "✅ All Good";
+                    statusElement.style.color = "green";
+                }
+            });
+    }
+
+    // Run every 1 second
+    setInterval(fetchStatus, 1000);
+    </script>
+
+</body>
+</html> 
