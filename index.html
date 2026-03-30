@@ -1,40 +1,143 @@
+<!DOCTYPE html>
 <html>
 <head>
     <title>AI Proctoring System</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: linear-gradient(to right, #e3f2fd, #ffffff);
+            text-align: center;
+        }
+
+        h1 {
+            background: #007bff;
+            color: white;
+            padding: 15px;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 18px;
+            border: none;
+            background: #007bff;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        #video {
+            margin-top: 20px;
+            border: 4px solid #333;
+            border-radius: 10px;
+        }
+
+        #status {
+            font-size: 22px;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        #timer {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>AI Proctoring System</h1>
 
-    <img src="http://127.0.0.1:5000/video" width="600">
+<h1>AI Exam Proctoring System</h1>
 
-    <h2 id="status">Loading...</h2>
+<button onclick="startExam()">▶ Start Exam</button>
 
-    <script>
-    function fetchStatus() {
-        fetch("http://127.0.0.1:5000/status")
-            .then(response => response.text())
-            .then(data => {
-                let statusElement = document.getElementById("status");
+<div id="timer">Time: 00:00</div>
 
-                if (data.includes("No Face")) {
-                    statusElement.innerText = "⚠ No Face Detected";
-                    statusElement.style.color = "orange";
-                } 
-                else if (data.includes("Multiple")) {
-                    statusElement.innerText = "🚨 Multiple Faces Detected";
-                    statusElement.style.color = "red";
-                } 
-                else {
-                    statusElement.innerText = "✅ All Good";
-                    statusElement.style.color = "green";
-                }
-            });
+<img id="video" src="" width="600">
+
+<h2 id="status">Waiting to start...</h2>
+<script>
+let seconds = 0;
+let examDuration = 120; // 2 min
+let timerInterval;
+let statusInterval;
+
+function startExam() {
+    // Reset values (important if clicked again)
+    seconds = 0;
+
+    document.getElementById("video").src = "http://127.0.0.1:5000/video";
+    document.getElementById("status").innerText = "Starting...";
+
+    // Timer
+    timerInterval = setInterval(() => {
+        seconds++;
+
+        let mins = Math.floor(seconds / 60);
+        let secs = seconds % 60;
+
+        document.getElementById("timer").innerText =
+            "Time: " + String(mins).padStart(2, '0') + ":" + String(secs).padStart(2, '0');
+
+        if (seconds >= examDuration) {
+            stopExam();
+        }
+    }, 1000);
+
+    // ✅ Prevent multiple intervals
+    if (!statusInterval) {
+        statusInterval = setInterval(fetchStatus, 1000);
     }
+}
 
-    // Run every 1 second
-    setInterval(fetchStatus, 1000);
-    </script>
+function stopExam() {
+    clearInterval(timerInterval);
+    clearInterval(statusInterval);
+
+    statusInterval = null;
+
+    document.getElementById("video").src = "";
+
+    let status = document.getElementById("status");
+    status.innerText = "⛔ Exam Finished";
+    status.style.color = "black";
+}
+
+// Fetch backend status
+function fetchStatus() {
+    fetch("http://127.0.0.1:5000/status")
+        .then(res => res.text())
+        .then(data => {
+            let s = document.getElementById("status");
+
+            if (data.includes("No Face")) {
+                s.innerText = "⚠ No Face Detected";
+                s.style.color = "orange";
+            } 
+            else if (data.includes("Multiple")) {
+                s.innerText = "🚨 Multiple Faces Detected";
+                s.style.color = "red";
+            } 
+            else {
+                s.innerText = "✅ All Good";
+                s.style.color = "green";
+            }
+        });
+}
+
+
+document.addEventListener("visibilitychange", function () {
+    if (document.hidden) {
+        alert("⚠ Tab switched! This is not allowed.");
+
+        fetch("http://127.0.0.1:5000/tab_switch");
+    }
+});
+</script>
 
 </body>
-</html> 
+</html>
