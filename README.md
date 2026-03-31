@@ -1,14 +1,62 @@
-🤖 AI-Based Exam Proctoring System
-📌 Project Description
+# 🤖 AI-Based Exam Proctoring System
 
-This project is an AI-based exam proctoring system designed to monitor students during online examinations using computer vision and machine learning techniques. The system uses a webcam to track candidate behavior in real-time and detect suspicious activities such as multiple faces, absence from screen, or unusual head movements.
+## 📌 Description
 
-The goal of this project is to ensure fairness and integrity in online exams by automating the invigilation process.
+This project is an AI-based exam proctoring system that monitors students during online exams using computer vision. It detects suspicious activities like absence of face, multiple faces, and tab switching.
 
-🎯 Features
-👤 Real-time face detection using webcam
-🚨 Detection of multiple faces (possible cheating alert)
-❌ Alerts when no face is detected
-👀 Basic head movement / attention tracking
-📝 Logging of suspicious activities with timestamps
-🌐 Simple user interface for monitoring
+---
+
+## 🎯 Features
+
+* 🎥 Real-time webcam monitoring
+* 👤 Face detection
+* ❌ No face detection
+* 🚨 Multiple faces detection
+* 🔄 Tab switching detection
+* 🧠 Smart logging system
+* 🌐 Web-based UI with alerts
+* ⏱ Exam timer and flow
+
+---
+
+## 🛠 Tech Stack
+
+* Python
+* OpenCV
+* Flask
+* HTML, CSS, JavaScript
+
+---
+
+## 🚀 How to Run
+
+1. Install dependencies:
+
+```
+pip install opencv-python flask
+```
+
+2. Run backend:
+
+```
+python backend/app.py
+```
+
+3. Open `index.html` in browser
+
+---
+
+
+## 📌 Future Improvements
+
+* Face recognition
+* Eye tracking
+* Mobile detection
+* Admin dashboard
+
+---
+
+## 👩‍💻 Author
+
+Yuvika Pundir
+
