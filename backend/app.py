@@ -11,7 +11,7 @@ face_cascade = cv2.CascadeClassifier(
 )
 
 last_status = ""
-no_face_frames = 0  # ✅ stability fix
+no_face_frames = 0  
 
 def log_event(message):
     with open("log.txt", "a") as f:
@@ -27,7 +27,7 @@ def generate_frames():
 
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        # ✅ Improved detection
+       
         faces = face_cascade.detectMultiScale(
             gray,
             scaleFactor=1.1,
@@ -35,7 +35,7 @@ def generate_frames():
             minSize=(50, 50)
         )
 
-        # 🧠 Stable proctoring logic
+        
         if len(faces) == 0:
             no_face_frames += 1
 
@@ -52,26 +52,32 @@ def generate_frames():
             else:
                 status = "OK"
 
-        # ✅ Smart logging
+       
         if status != last_status:
             log_event(status)
             last_status = status
 
-        # Draw boxes
+      
         for (x, y, w, h) in faces:
             cv2.rectangle(frame, (x,y), (x+w,y+h), (255,0,0), 2)
 
-        # Show status
+        
         cv2.putText(frame, status, (20, 50),
                     cv2.FONT_HERSHEY_SIMPLEX, 1,
                     (0, 0, 255), 2)
 
-        # Convert frame
+        
         ret, buffer = cv2.imencode('.jpg', frame)
         frame = buffer.tobytes()
 
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+from flask import send_from_directory
+
+@app.route('/')
+def home():
+    return send_from_directory('.', 'index.html')
 
 @app.route('/video')
 def video():
