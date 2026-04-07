@@ -1,6 +1,7 @@
-from flask import Flask, Response
+from flask import Flask, Response, render_template
 import cv2
 from datetime import datetime
+import os
 
 app = Flask(__name__)
 
@@ -27,7 +28,6 @@ def generate_frames():
 
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-       
         faces = face_cascade.detectMultiScale(
             gray,
             scaleFactor=1.1,
@@ -38,63 +38,60 @@ def generate_frames():
         
         if len(faces) == 0:
             no_face_frames += 1
-
             if no_face_frames > 10:
                 status = "No Face Detected"
             else:
                 status = "OK"
-
         else:
             no_face_frames = 0
-
             if len(faces) > 1:
                 status = "Multiple Faces Detected"
             else:
                 status = "OK"
 
-       
+        
         if status != last_status:
             log_event(status)
             last_status = status
 
-      
+        
         for (x, y, w, h) in faces:
             cv2.rectangle(frame, (x,y), (x+w,y+h), (255,0,0), 2)
 
-        
+       
         cv2.putText(frame, status, (20, 50),
                     cv2.FONT_HERSHEY_SIMPLEX, 1,
                     (0, 0, 255), 2)
 
-        
         ret, buffer = cv2.imencode('.jpg', frame)
         frame = buffer.tobytes()
 
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
-from flask import send_from_directory
 
 @app.route('/')
 def home():
-    return send_from_directory('.', 'index.html')
+    return render_template('index.html')
+
 
 @app.route('/video')
 def video():
     return Response(generate_frames(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
+
 @app.route('/tab_switch')
 def tab_switch():
     log_event("Tab switched detected")
     return "ok"
+
 
 @app.route('/status')
 def get_status():
     global last_status
     return last_status
 
-import os
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
