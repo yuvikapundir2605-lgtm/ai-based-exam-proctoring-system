@@ -55,7 +55,7 @@ def detect():
     
     if len(faces) == 0:
         no_face_frames += 1
-        status = "No Face Detected" if no_face_frames > 10 else "OK"
+        status = "No Face Detected" if no_face_frames > 3 else "OK"
     else:
         no_face_frames = 0
         if len(faces) > 1:
