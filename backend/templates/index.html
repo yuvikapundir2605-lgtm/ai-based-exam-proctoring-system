@@ -30,7 +30,7 @@
             background: #0056b3;
         }
 
-        #video {
+        video {
             margin-top: 20px;
             border: 4px solid #333;
             border-radius: 10px;
@@ -57,20 +57,36 @@
 
 <div id="timer">Time: 00:00</div>
 
-<img id="video" src="" width="600">
+
+<video id="video" width="600" autoplay playsinline></video>
+
+
+<canvas id="canvas" style="display:none;"></canvas>
 
 <h2 id="status">Waiting to start...</h2>
+
 <script>
 let seconds = 0;
-let examDuration = 120; // 2 min
+let examDuration = 120;
 let timerInterval;
 let statusInterval;
+let stream;
+
 
 function startExam() {
-    // Reset values (important if clicked again)
+
     seconds = 0;
 
-    document.getElementById("video").src = "http://127.0.0.1:5000/video";
+    
+    navigator.mediaDevices.getUserMedia({ video: true })
+    .then(s => {
+        stream = s;
+        document.getElementById("video").srcObject = stream;
+    })
+    .catch(err => {
+        alert("Camera access denied!");
+    });
+
     document.getElementById("status").innerText = "Starting...";
 
     // Timer
@@ -88,28 +104,52 @@ function startExam() {
         }
     }, 1000);
 
-    // ✅ Prevent multiple intervals
+    
+    setInterval(sendFrame, 1000);
+
+   
     if (!statusInterval) {
         statusInterval = setInterval(fetchStatus, 1000);
     }
 }
 
+
 function stopExam() {
     clearInterval(timerInterval);
     clearInterval(statusInterval);
 
-    statusInterval = null;
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+    }
 
-    document.getElementById("video").src = "";
-
-    let status = document.getElementById("status");
-    status.innerText = "⛔ Exam Finished";
-    status.style.color = "black";
+    document.getElementById("status").innerText = "⛔ Exam Finished";
 }
 
-// Fetch backend status
+
+function sendFrame() {
+    let video = document.getElementById("video");
+    let canvas = document.getElementById("canvas");
+    let ctx = canvas.getContext("2d");
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    ctx.drawImage(video, 0, 0);
+
+    let imageData = canvas.toDataURL("image/jpeg");
+
+    fetch(window.location.origin + "/detect", {
+        method: "POST",
+        body: JSON.stringify({ image: imageData }),
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
+
+
 function fetchStatus() {
-    fetch("http://127.0.0.1:5000/status")
+    fetch(window.location.origin + "/status")
         .then(res => res.text())
         .then(data => {
             let s = document.getElementById("status");
@@ -133,8 +173,7 @@ function fetchStatus() {
 document.addEventListener("visibilitychange", function () {
     if (document.hidden) {
         alert("⚠ Tab switched! This is not allowed.");
-
-        fetch("http://127.0.0.1:5000/tab_switch");
+        fetch(window.location.origin + "/tab_switch");
     }
 });
 </script>

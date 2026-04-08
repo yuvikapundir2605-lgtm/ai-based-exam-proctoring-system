@@ -1,98 +1,33 @@
-from flask import Flask, Response, render_template
-import cv2
-from datetime import datetime
-import os
+from flask import request
+import base64
+import numpy as np
 
-app = Flask(__name__)
-
-camera = cv2.VideoCapture(0)
-
-face_cascade = cv2.CascadeClassifier(
-    cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
-)
-
-last_status = ""
-no_face_frames = 0  
-
-def log_event(message):
-    with open("log.txt", "a") as f:
-        f.write(f"{datetime.now()} - {message}\n")
-
-def generate_frames():
+@app.route('/detect', methods=['POST'])
+def detect():
     global last_status, no_face_frames
 
-    while True:
-        success, frame = camera.read()
-        if not success:
-            break
+    data = request.json['image']
 
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    # remove header
+    encoded = data.split(',')[1]
+    img_bytes = base64.b64decode(encoded)
 
-        faces = face_cascade.detectMultiScale(
-            gray,
-            scaleFactor=1.1,
-            minNeighbors=7,
-            minSize=(50, 50)
-        )
+    np_arr = np.frombuffer(img_bytes, np.uint8)
+    frame = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
 
-        
-        if len(faces) == 0:
-            no_face_frames += 1
-            if no_face_frames > 10:
-                status = "No Face Detected"
-            else:
-                status = "OK"
-        else:
-            no_face_frames = 0
-            if len(faces) > 1:
-                status = "Multiple Faces Detected"
-            else:
-                status = "OK"
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        
-        if status != last_status:
-            log_event(status)
-            last_status = status
+    faces = face_cascade.detectMultiScale(gray, 1.1, 7, minSize=(50,50))
 
-        
-        for (x, y, w, h) in faces:
-            cv2.rectangle(frame, (x,y), (x+w,y+h), (255,0,0), 2)
+    if len(faces) == 0:
+        no_face_frames += 1
+        status = "No Face Detected" if no_face_frames > 10 else "OK"
+    else:
+        no_face_frames = 0
+        status = "Multiple Faces Detected" if len(faces) > 1 else "OK"
 
-       
-        cv2.putText(frame, status, (20, 50),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1,
-                    (0, 0, 255), 2)
+    if status != last_status:
+        log_event(status)
+        last_status = status
 
-        ret, buffer = cv2.imencode('.jpg', frame)
-        frame = buffer.tobytes()
-
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-
-@app.route('/video')
-def video():
-    return Response(generate_frames(),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
-
-
-@app.route('/tab_switch')
-def tab_switch():
-    log_event("Tab switched detected")
-    return "ok"
-
-
-@app.route('/status')
-def get_status():
-    global last_status
-    return last_status
-
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    return status
