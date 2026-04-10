@@ -57,9 +57,7 @@
 
 <div id="timer">Time: 00:00</div>
 
-
 <video id="video" width="600" autoplay playsinline></video>
-
 
 <canvas id="canvas" style="display:none;"></canvas>
 
@@ -70,21 +68,30 @@ let seconds = 0;
 let examDuration = 120;
 let timerInterval;
 let statusInterval;
+let frameInterval;
 let stream;
 
+const video = document.getElementById("video");
 
 function startExam() {
 
     seconds = 0;
 
-    
     navigator.mediaDevices.getUserMedia({ video: true })
     .then(s => {
         stream = s;
-        document.getElementById("video").srcObject = stream;
+        video.srcObject = stream;
+
+       
+        let track = stream.getVideoTracks()[0];
+        track.onended = function () {
+            alert("⚠ Camera turned off!");
+            fetch(window.location.origin + "/camera_off");
+        };
     })
     .catch(err => {
-        alert("Camera access denied!");
+        alert("⚠ Camera access denied!");
+        fetch(window.location.origin + "/camera_off");
     });
 
     document.getElementById("status").innerText = "Starting...";
@@ -104,19 +111,19 @@ function startExam() {
         }
     }, 1000);
 
-    
-    setInterval(sendFrame, 1000);
-
    
+    frameInterval = setInterval(sendFrame, 1000);
+
+    
     if (!statusInterval) {
         statusInterval = setInterval(fetchStatus, 1000);
     }
 }
 
-
 function stopExam() {
     clearInterval(timerInterval);
     clearInterval(statusInterval);
+    clearInterval(frameInterval);
 
     if (stream) {
         stream.getTracks().forEach(track => track.stop());
@@ -125,11 +132,11 @@ function stopExam() {
     document.getElementById("status").innerText = "⛔ Exam Finished";
 }
 
-
 function sendFrame() {
-    let video = document.getElementById("video");
     let canvas = document.getElementById("canvas");
     let ctx = canvas.getContext("2d");
+
+    if (!video.videoWidth) return; // fix crash before video loads
 
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
@@ -146,7 +153,6 @@ function sendFrame() {
         }
     });
 }
-
 
 function fetchStatus() {
     fetch(window.location.origin + "/status")
