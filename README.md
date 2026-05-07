@@ -1,62 +1,85 @@
-# 🤖 AI-Based Exam Proctoring System
+🤖 AI-Based Exam Proctoring System
 
-## 📌 Description
+📌 Description
 
-This project is an AI-based exam proctoring system that monitors students during online exams using computer vision. It detects suspicious activities like absence of face, multiple faces, and tab switching.
-
----
-
-## 🎯 Features
-
-* 🎥 Real-time webcam monitoring
-* 👤 Face detection
-* ❌ No face detection
-* 🚨 Multiple faces detection
-* 🔄 Tab switching detection
-* 🧠 Smart logging system
-* 🌐 Web-based UI with alerts
-* ⏱ Exam timer and flow
+The AI-Based Exam Proctoring System is a real-time monitoring application designed to ensure fairness during online exams. It uses browser-based webcam access to capture video and sends frames to a Flask backend where OpenCV processes them for face detection. The system identifies suspicious activities such as absence of the candidate, presence of multiple faces, and tab switching. It provides live alerts and maintains a smart log of important events. This project demonstrates the integration of computer vision, web technologies, and cloud deployment.
 
 ---
 
-## 🛠 Tech Stack
+🎯 Features
 
-* Python
-* OpenCV
-* Flask
-* HTML, CSS, JavaScript
+- 🎥 Browser-based webcam monitoring
+- 👤 Face detection using OpenCV
+- ❌ No face detection
+- 🚨 Multiple faces detection
+- 🔄 Tab switching detection
+- 🧠 Smart event logging
+- 🌐 User-friendly web interface
+- ⏱ Exam timer and flow control
+- ☁️ Deployed on cloud (Render)
 
 ---
 
-## 🚀 How to Run
+🛠 Tech Stack
 
-1. Install dependencies:
+- Frontend: HTML, CSS, JavaScript
+- Backend: Python (Flask)
+- Computer Vision: OpenCV
+- Deployment: Render
 
-```
-pip install opencv-python flask
-```
+---
 
-2. Run backend:
+🚀 How It Works
 
-```
+1. User starts the exam from the web interface
+2. Browser requests webcam access
+3. Frames are captured and sent to the backend
+4. Flask processes frames using OpenCV
+5. System detects suspicious activities
+6. Alerts are displayed and events are logged
+
+---
+
+⚙️ Installation & Setup
+
+1. Clone Repository
+
+git clone https://github.com/your-username/ai-based-exam-proctoring-system.git
+cd ai-based-exam-proctoring-system
+
+2. Install Dependencies
+
+pip install -r requirements.txt
+
+3. Run the Application
+
 python backend/app.py
-```
 
-3. Open `index.html` in browser
+4. Open in Browser
 
----
-
-
-## 📌 Future Improvements
-
-* Face recognition
-* Eye tracking
-* Mobile detection
-* Admin dashboard
+http://127.0.0.1:5000
 
 ---
 
-## 👩‍💻 Author
+🌐 Live Demo
+
+👉 https://ai-based-exam-proctoring-system.onrender.com
+
+⚠️ Note: Webcam-based monitoring works best in local environment due to browser security restrictions.
+
+
+---
+
+📌 Future Enhancements
+
+- Face recognition (identity verification)
+- Eye tracking
+- Mobile phone detection
+- Camera on/off detection
+- Admin dashboard
+
+---
+
+👩‍💻 Author
 
 Yuvika Pundir
-
