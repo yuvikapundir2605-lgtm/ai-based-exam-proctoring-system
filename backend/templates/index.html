@@ -1,8 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}
-Home
-{% endblock %}
+{% block title %}Home{% endblock %}
 
 {% block content %}
 
@@ -13,21 +11,29 @@ Home
         <h1>AI Exam Proctoring System</h1>
 
         <p>
-            A secure online examination platform powered by Artificial Intelligence
-            to monitor candidates in real time.
+            A secure AI-powered online examination platform for
+            monitoring candidates in real time using computer vision.
         </p>
 
-        <a href="/login" class="btn">
-            Get Started
-        </a>
+        <div class="hero-buttons">
+
+            <a href="/login" class="btn-primary">
+                Login
+            </a>
+
+            <a href="#features" class="btn-secondary">
+                Learn More
+            </a>
+
+        </div>
 
     </div>
 
 </section>
 
-<section class="features">
+<section class="features" id="features">
 
-    <h2>Key Features</h2>
+    <h2>Why Choose Our Platform?</h2>
 
     <div class="cards">
 
@@ -38,17 +44,17 @@ Home
 
         <div class="card">
             <h3>👥 Multiple Face Detection</h3>
-            <p>Identifies if more than one person appears in front of the camera.</p>
+            <p>Alerts when more than one person appears in front of the camera.</p>
         </div>
 
         <div class="card">
-            <h3>🔄 Tab Switching Detection</h3>
-            <p>Detects when a student switches browser tabs during the exam.</p>
+            <h3>🔄 Tab Switching</h3>
+            <p>Detects browser tab changes and records them as violations.</p>
         </div>
 
         <div class="card">
-            <h3>📊 Smart Monitoring</h3>
-            <p>Provides real-time alerts and logs suspicious activities automatically.</p>
+            <h3>📋 Smart Logging</h3>
+            <p>Automatically records suspicious activities for later review.</p>
         </div>
 
     </div>
