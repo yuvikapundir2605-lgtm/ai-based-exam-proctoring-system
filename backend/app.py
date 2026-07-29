@@ -20,9 +20,9 @@ def log_event(message):
         f.write(f"{datetime.now()} - {message}\n")
 
 
-@app.route('/')
-def home():
-    return render_template('index.html')
+@app.route("/exam")
+def exam():
+    return render_template("exam.html")
 
 
 @app.route('/detect', methods=['POST'])
@@ -90,7 +90,25 @@ def camera_off():
     log_event("Camera turned off detected")
     return "ok"
 
+@app.route("/")
+def home():
+    return render_template("index.html")
 
+
+@app.route("/login")
+def login():
+    return render_template("login.html")
+
+
+@app.route("/teacher")
+def teacher():
+    return render_template("teacher_dashboard.html")
+
+
+@app.route("/student")
+def student():
+    return render_template("student_dashboard.html")
+    
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)

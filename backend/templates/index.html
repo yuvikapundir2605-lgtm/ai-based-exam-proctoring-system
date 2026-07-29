@@ -1,188 +1,58 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>AI Proctoring System</title>
+{% extends "base.html" %}
 
-    <style>
-        body {
-            font-family: Arial;
-            background: linear-gradient(to right, #e3f2fd, #ffffff);
-            text-align: center;
-        }
+{% block title %}
+Home
+{% endblock %}
 
-        h1 {
-            background: #007bff;
-            color: white;
-            padding: 15px;
-        }
+{% block content %}
 
-        button {
-            padding: 12px 25px;
-            font-size: 18px;
-            border: none;
-            background: #007bff;
-            color: white;
-            border-radius: 6px;
-            cursor: pointer;
-        }
+<section class="hero">
 
-        button:hover {
-            background: #0056b3;
-        }
+    <div class="hero-content">
 
-        video {
-            margin-top: 20px;
-            border: 4px solid #333;
-            border-radius: 10px;
-        }
+        <h1>AI Exam Proctoring System</h1>
 
-        #status {
-            font-size: 22px;
-            margin-top: 15px;
-            font-weight: bold;
-        }
+        <p>
+            A secure online examination platform powered by Artificial Intelligence
+            to monitor candidates in real time.
+        </p>
 
-        #timer {
-            font-size: 18px;
-            margin-top: 10px;
-        }
-    </style>
-</head>
+        <a href="/login" class="btn">
+            Get Started
+        </a>
 
-<body>
+    </div>
 
-<h1>AI Exam Proctoring System</h1>
+</section>
 
-<button onclick="startExam()">▶ Start Exam</button>
+<section class="features">
 
-<div id="timer">Time: 00:00</div>
+    <h2>Key Features</h2>
 
-<video id="video" width="600" autoplay playsinline></video>
+    <div class="cards">
 
-<canvas id="canvas" style="display:none;"></canvas>
+        <div class="card">
+            <h3>📷 Face Detection</h3>
+            <p>Detects whether the candidate is present during the examination.</p>
+        </div>
 
-<h2 id="status">Waiting to start...</h2>
+        <div class="card">
+            <h3>👥 Multiple Face Detection</h3>
+            <p>Identifies if more than one person appears in front of the camera.</p>
+        </div>
 
-<script>
-let seconds = 0;
-let examDuration = 120;
-let timerInterval;
-let statusInterval;
-let frameInterval;
-let stream;
+        <div class="card">
+            <h3>🔄 Tab Switching Detection</h3>
+            <p>Detects when a student switches browser tabs during the exam.</p>
+        </div>
 
-const video = document.getElementById("video");
+        <div class="card">
+            <h3>📊 Smart Monitoring</h3>
+            <p>Provides real-time alerts and logs suspicious activities automatically.</p>
+        </div>
 
-function startExam() {
+    </div>
 
-    seconds = 0;
+</section>
 
-    navigator.mediaDevices.getUserMedia({ video: true })
-    .then(s => {
-        stream = s;
-        video.srcObject = stream;
-
-       
-        let track = stream.getVideoTracks()[0];
-        track.onended = function () {
-            alert("⚠ Camera turned off!");
-            fetch(window.location.origin + "/camera_off");
-        };
-    })
-    .catch(err => {
-        alert("⚠ Camera access denied!");
-        fetch(window.location.origin + "/camera_off");
-    });
-
-    document.getElementById("status").innerText = "Starting...";
-
-    // Timer
-    timerInterval = setInterval(() => {
-        seconds++;
-
-        let mins = Math.floor(seconds / 60);
-        let secs = seconds % 60;
-
-        document.getElementById("timer").innerText =
-            "Time: " + String(mins).padStart(2, '0') + ":" + String(secs).padStart(2, '0');
-
-        if (seconds >= examDuration) {
-            stopExam();
-        }
-    }, 1000);
-
-   
-    frameInterval = setInterval(sendFrame, 1000);
-
-    
-    if (!statusInterval) {
-        statusInterval = setInterval(fetchStatus, 1000);
-    }
-}
-
-function stopExam() {
-    clearInterval(timerInterval);
-    clearInterval(statusInterval);
-    clearInterval(frameInterval);
-
-    if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-    }
-
-    document.getElementById("status").innerText = "⛔ Exam Finished";
-}
-
-function sendFrame() {
-    let canvas = document.getElementById("canvas");
-    let ctx = canvas.getContext("2d");
-
-    if (!video.videoWidth) return; // fix crash before video loads
-
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-
-    ctx.drawImage(video, 0, 0);
-
-    let imageData = canvas.toDataURL("image/jpeg");
-
-    fetch(window.location.origin + "/detect", {
-        method: "POST",
-        body: JSON.stringify({ image: imageData }),
-        headers: {
-            "Content-Type": "application/json"
-        }
-    });
-}
-
-function fetchStatus() {
-    fetch(window.location.origin + "/status")
-        .then(res => res.text())
-        .then(data => {
-            let s = document.getElementById("status");
-
-            if (data.includes("No Face")) {
-                s.innerText = "⚠ No Face Detected";
-                s.style.color = "orange";
-            } 
-            else if (data.includes("Multiple")) {
-                s.innerText = "🚨 Multiple Faces Detected";
-                s.style.color = "red";
-            } 
-            else {
-                s.innerText = "✅ All Good";
-                s.style.color = "green";
-            }
-        });
-}
-
-
-document.addEventListener("visibilitychange", function () {
-    if (document.hidden) {
-        alert("⚠ Tab switched! This is not allowed.");
-        fetch(window.location.origin + "/tab_switch");
-    }
-});
-</script>
-
-</body>
-</html>
+{% endblock %}
