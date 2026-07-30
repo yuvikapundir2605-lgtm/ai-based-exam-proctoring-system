@@ -1,3 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Teacher Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="dashboard">
+
+    <aside class="sidebar">
+
+        <h2>Teacher Panel</h2>
+
+        <ul>
+
+            <li><a href="#">🏠 Dashboard</a></li>
+            <li><a href="#">📝 Create Quiz</a></li>
+            <li><a href="#">📚 Manage Quizzes</a></li>
+            <li><a href="#">📊 Reports</a></li>
+            <li><a href="/">🚪 Logout</a></li>
+
+        </ul>
+
+    </aside>
+
+    <div class="dashboard-content">
+
+        <h1>Welcome, Teacher</h1>
+
+        <div class="stats">
+
+            <div class="stat-card">
+                <h2>10</h2>
+                <p>Total Quizzes</p>
+            </div>
+
+            <div class="stat-card">
+                <h2>45</h2>
+                <p>Students</p>
+            </div>
+
+            <div class="stat-card">
+                <h2>8</h2>
+                <p>Completed Exams</p>
+            </div>
+
+            <div class="stat-card">
+                <h2>96%</h2>
+                <p>Average Score</p>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
 <head>
     ...
     <link rel="stylesheet"
